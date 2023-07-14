@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Type, Any
+from typing import Dict, Type, Any, List
 from typing import TypeVar
 
 from pydantic import BaseModel, constr
 
-ISO_8601_UTC_TIMESTAMP_REGEX = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$'
+ISO_8601_UTC_TIMESTAMP_REGEX = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$'
 
 T = TypeVar('T', bound='DynamoDBItemInterface')
 
@@ -39,3 +39,19 @@ class Event(BaseModel, DynamoDBItemInterface):
     @classmethod
     def from_dynamodb_item(cls, dynamodb_item):
         return cls(**dynamodb_item)
+
+
+class BucketsRangeRequest(BaseModel):
+    customer_id: str
+    start: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+    end: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+
+
+class Bucket(BaseModel):
+    ts_start_of_hour: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+    count: int
+
+
+class BucketsResponse(BaseModel):
+    customer_id: str
+    buckets: List[Bucket]
