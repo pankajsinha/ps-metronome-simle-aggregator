@@ -1,6 +1,12 @@
+import boto3
+
+session = boto3.Session(profile_name='default')
+dynamodb_resource = session.resource('dynamodb', endpoint_url='http://localhost:9000')
+
+
 class ItemDAO:
 
-    def __init__(self, dynamodb_resource, table_name):
+    def __init__(self, table_name):
         self.table = dynamodb_resource.Table(table_name)
 
     def upsert_item(self, item):
@@ -24,7 +30,8 @@ class ItemDAO:
                 ':pk_value': partition_key,
                 ':sk_start': sort_key_start,
                 ':sk_end': sort_key_end
-            }
+            },
+            ScanIndexForward=True  # Sort the items in ascending order based on sort_key
         )
 
         items = response['Items']

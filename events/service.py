@@ -1,15 +1,11 @@
 from collections import defaultdict
 from typing import DefaultDict, List
 
-import boto3
-
 import datamodels
 from events import dao
 from models import Event, BucketsResponse, BucketsRangeRequest, Bucket
 
-session = boto3.Session(profile_name='default')
-dynamodb_resource = session.resource('dynamodb', endpoint_url='http://localhost:9000')
-events_item_DAO = dao.ItemDAO(dynamodb_resource, datamodels.events_table_name)
+events_item_DAO = dao.ItemDAO(datamodels.events_table_name)
 
 
 def persist_event(event: Event) -> None:
