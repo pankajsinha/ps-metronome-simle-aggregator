@@ -24,7 +24,7 @@ class Event(BaseModel, DynamoDBItemInterface):
     customer_id: str
     event_type: str
     transaction_id: str
-    ts: constr(regex=ISO_8601_UTC_TIMESTAMP_REGEX)
+    ts: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
 
     def to_dynamodb_item(self) -> Dict:
         return {
