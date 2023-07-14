@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Type, Any, List
 from typing import TypeVar
+from dateutil.parser import parse
 
 from pydantic import BaseModel, constr
 
@@ -39,6 +40,16 @@ class Event(BaseModel, DynamoDBItemInterface):
     @classmethod
     def from_dynamodb_item(cls, dynamodb_item):
         return cls(**dynamodb_item)
+
+    def get_start_of_the_hour(self) -> str:
+        # Parse the timestamp string
+        dt = parse(self.ts)
+        # set to start of the h
+        start_of_the_hour = dt.replace(minute=0, second=0, microsecond=0, millisecond=0)
+        # Format as ISO 8601 UTC timestamp
+        return start_of_the_hour.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+
 
 
 class BucketsRangeRequest(BaseModel):
