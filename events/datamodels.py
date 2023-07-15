@@ -1,10 +1,17 @@
+import os
+
 import boto3
+from dotenv import load_dotenv
+
+# Load configuration from .env file
+load_dotenv()
 
 session = boto3.Session(profile_name='default')
 
-dynamodb = session.client('dynamodb', endpoint_url='http://localhost:9000')
+DYNAMO_ENDPOINT_URL = os.getenv("DYNAMODB_ENDPOINT_URL")
+dynamodb = session.client('dynamodb', endpoint_url=DYNAMO_ENDPOINT_URL)
 
-events_table_name = 'metronome-events'
+events_table_name = os.getenv("DYNAMODB_EVENTS_TABLE_NAME")
 
 events_table_schema = {
     'TableName': events_table_name,
