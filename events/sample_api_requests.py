@@ -42,16 +42,10 @@ def get_total_count_of_events(buckets_response: BucketsResponse) -> int:
 
 
 if __name__ == '__main__':
-    # Run a buckets range query for 10k+ events customer in the time range of 30 years ago There are 143k events for
-    # customer key b4f9279a0196e40632e947dd1a88e857 but it is only 10k returning 4k events response=BucketsResponse(
-    # customer_id='b4f9279a0196e40632e947dd1a88e857', buckets=[Bucket(ts_start_of_hour='2021-03-01T00:00:00.000000Z',
-    # count=2499), Bucket(ts_start_of_hour='2021-03-01T01:00:00.000000Z', count=658),
-    # Bucket(ts_start_of_hour='2021-03-01T02:00:00.000000Z', count=185),
-    # Bucket(ts_start_of_hour='2021-03-01T03:00:00.000000Z', count=661)]) request=BucketsRangeRequest(
-    # customer_id='b4f9279a0196e40632e947dd1a88e857', start='1993-07-21T19:09:18.902350Z',
-    # end='2023-07-14T19:09:18.902350Z') query_time=datetime.timedelta(seconds=1, microseconds=938837)
-    # total_unique_events=4003
-    query_1_result = get_buckets_for_customer_for_30_years_range('b4f9279a0196e40632e947dd1a88e857')
+    query_1_result = get_buckets_for_customer_for_30_years_range('1abb42414607955dbf6088b99f837d8f')
     print(query_1_result)
-    query_2_result = get_buckets_for_customer_for_30_years_range('1abb42414607955dbf6088b99f837d8f')
+
+    # Run a buckets range query for 143k events customer
+    query_2_result = get_buckets_for_customer_for_30_years_range('b4f9279a0196e40632e947dd1a88e857')
     print(query_2_result)
+

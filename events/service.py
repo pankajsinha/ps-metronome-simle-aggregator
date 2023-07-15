@@ -13,21 +13,39 @@ def persist_event(event: Event) -> None:
 
 
 def get_buckets(request: BucketsRangeRequest) -> BucketsResponse:
+    buckets: List[Bucket] = []
     # Get all events_old for customer in the given time range.
     # TODO: Add pagination (i.e. Limit parameter for the dynamoDB query)
-    items = events_item_DAO.get_items_by_partition_and_sort_key_range(
-        request.customer_id, request.start, request.end
-    )
-    events = [Event.from_dynamodb_item(item) for item in items]
-    # TODO: Use the sorted order of the results and just use current start_ts rather than the whole map to reduce memory
-    #  footprint of maintaining the start_ts_to_buckets for a large time range.
-    start_ts_to_buckets: DefaultDict[str, int] = defaultdict(int)
-    for event in events:
-        # Increment the start of the hour count for the event
-        start_ts_to_buckets[event.get_start_of_the_hour()] += 1
-    buckets: List[Bucket] = []
-    for ts, count in start_ts_to_buckets.items():
-        buckets.append(Bucket(ts_start_of_hour=ts, count=count))
+    last_evaluated_key = None
+    cur_ts = None
+    count = 0
+    iteration = 0
+    while True:
+        iteration += 1
+        items_result = events_item_DAO.get_items_by_partition_and_sort_key_range(
+            request.customer_id, request.start, request.end, last_evaluated_key
+        )
+
+        for item in items_result.items:
+            event = Event.from_dynamodb_item(item)
+            ts = event.get_start_of_the_hour()
+            if ts == cur_ts:
+                count += 1
+            else:
+                # Flush the bucket since the current start of the hour ts is different
+                if cur_ts is not None:
+                    buckets.append(Bucket(ts_start_of_hour=cur_ts, count=count))
+                cur_ts = ts
+                count = 1
+
+        last_evaluated_key = items_result.last_evaluated_key
+        if last_evaluated_key is None:
+            break
+        print("Iteration: ", iteration)
+        print("Num of items: ", len(items_result.items))
+    if cur_ts is not None:
+        buckets.append(Bucket(ts_start_of_hour=cur_ts, count=count))
+
     return BucketsResponse(customer_id=request.customer_id, buckets=buckets)
 
 
