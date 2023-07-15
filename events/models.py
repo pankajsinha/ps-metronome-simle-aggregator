@@ -1,11 +1,13 @@
+import re
 from abc import ABC, abstractmethod
 from typing import Dict, Type, Any, List
 from typing import TypeVar
 from dateutil.parser import parse
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, Field
 
 ISO_8601_UTC_TIMESTAMP_REGEX = r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$'
+iso_8601_pattern = re.compile(ISO_8601_UTC_TIMESTAMP_REGEX)
 
 T = TypeVar('T', bound='DynamoDBItemInterface')
 
@@ -25,7 +27,7 @@ class Event(BaseModel, DynamoDBItemInterface):
     customer_id: str
     event_type: str
     transaction_id: str
-    ts: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+    ts: str = Field(pattern=iso_8601_pattern)
 
     def to_dynamodb_item(self) -> Dict:
         return {
@@ -45,21 +47,19 @@ class Event(BaseModel, DynamoDBItemInterface):
         # Parse the timestamp string
         dt = parse(self.ts)
         # set to start of the h
-        start_of_the_hour = dt.replace(minute=0, second=0, microsecond=0, millisecond=0)
+        start_of_the_hour = dt.replace(minute=0, second=0, microsecond=0)
         # Format as ISO 8601 UTC timestamp
         return start_of_the_hour.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
-
-
 class BucketsRangeRequest(BaseModel):
     customer_id: str
-    start: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
-    end: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+    start: str = Field(pattern=iso_8601_pattern)
+    end:  str = Field(pattern=iso_8601_pattern)
 
 
 class Bucket(BaseModel):
-    ts_start_of_hour: constr(pattern=ISO_8601_UTC_TIMESTAMP_REGEX)
+    ts_start_of_hour: str = Field(pattern=iso_8601_pattern)
     count: int
 
 

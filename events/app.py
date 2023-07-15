@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from events import service
-from events.models import BucketsResponse, BucketsRangeRequest
+from events.models import BucketsRangeRequest, BucketsResponse
 
 app = FastAPI()
 
@@ -27,9 +27,9 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
     )
 
 
-@app.get("/events/customers/{customer_id}/buckets", response_model=BucketsRangeRequest, status_code=200)
+@app.get("/events/customers/{customer_id}/buckets", response_model=BucketsResponse, status_code=200)
 def get_buckets(request: BucketsRangeRequest, customer_id: str):
-    """ Get all events buckets started in the time range
+    """ Get all events_old buckets started in the time range
     """
     # Get all event buckets for customer in the given time range.
     buckets_response = service.get_buckets(request)
@@ -37,4 +37,4 @@ def get_buckets(request: BucketsRangeRequest, customer_id: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8800)

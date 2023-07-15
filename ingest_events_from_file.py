@@ -24,9 +24,9 @@ def read_csv_file_and_ingest_events(csv_file_path: str) -> None:
                     process_event(event, line_num)
 
                 if line_num % 1000 == 0:
-                    print(f"Processed {line_num} events.")
+                    print(f"Processed {line_num} events_old.")
             end_time = datetime.now()
-            print(f"Successfully processed all {line_num} events. Completed at {end_time}")
+            print(f"Successfully processed all {line_num} events_old. Completed at {end_time}")
             print(f"Total processing time: {end_time- start_time}")
 
     except FileNotFoundError:
@@ -82,4 +82,4 @@ if __name__ == "__main__":
         file_path = sys.argv[1]
         read_csv_file_and_ingest_events(file_path)
     else:
-        print("Please provide only the events csv file path as a command-line argument.")
+        print("Please provide only the events_old csv file path as a command-line argument.")
