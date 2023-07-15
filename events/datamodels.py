@@ -8,8 +8,8 @@ load_dotenv()
 
 session = boto3.Session(profile_name='default')
 
-DYNAMO_ENDPOINT_URL = os.getenv("DYNAMODB_ENDPOINT_URL")
-dynamodb = session.client('dynamodb', endpoint_url=DYNAMO_ENDPOINT_URL)
+DYNAMO_ENDPOINT_URL = os.getenv("DYNAMODB_ENDPOINT_URL") or 'http://localhost:9000'
+dynamodb = session.client('dynamodb', endpoint_url=DYNAMO_ENDPOINT_URL) or 'customer-events'
 
 events_table_name = os.getenv("DYNAMODB_EVENTS_TABLE_NAME")
 
@@ -22,7 +22,7 @@ events_table_schema = {
     'AttributeDefinitions': [
         {'AttributeName': 'partition_key', 'AttributeType': 'S'},
         {'AttributeName': 'sort_key', 'AttributeType': 'S'}
-        # FYI: Will add all these attributes for faster access and provide more flexibility (for filtering)
+        # FYI: Will Add these attributes during creation for faster access and provide more flexibility (for filtering)
         # {'AttributeName': 'customer_id', 'AttributeType': 'S'},
         # {'AttributeName': 'ts', 'AttributeType': 'S'},
         # {'AttributeName': 'event_type', 'AttributeType': 'S'},
@@ -38,4 +38,4 @@ try:
     table = dynamodb.create_table(**events_table_schema)
     print('Created table {}'.format(table['TableDescription']['TableName']))
 except dynamodb.exceptions.ResourceInUseException:
-    print('Metronome Events Table already exists')
+    print('Events Table already exists')
