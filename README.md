@@ -108,3 +108,8 @@ from the API layer
     1. Use DB to perform range based queries on the timestamp, this won't be possible if the timestamps are not defined in a uniform manner.
     2. It makes the contract of the system (API interface) simplified, basically all timestamps should be in the ISO 8601 in UTC
        1. Though for range queries for flexibility reasons we can allow timestamp in any format and convert to ISO 8601 in UTC before querying the service/databases.
+
+## Proposed Architecture
+If we need to support this in production, here is my proposed high level architecture.
+NOTE: It just contains the storage paths and not Query layer. We can have different apps/services querying the data. Also the table structure will also depend on type of queries to be supported.
+![Image Description](resources/events_architecture.png)
